@@ -14,8 +14,8 @@ jobs:
             - v1-dependencies-
       - run: gradle dependencies
       - run:
-        name: ビルドの実施
-        command: gradle build -x test
+          name: ビルドの実施
+          command: gradle build -x test
       - save_cache:
           paths:
             - ~/.gradle
