@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.7.22"
     id("jacoco")
     id("org.jetbrains.kotlin.kapt") version "1.2.71"
+    id("org.sonarqube") version "3.5.0.2730"
 }
 
 version = "0.0.1-SNAPSHOT"
@@ -56,6 +57,14 @@ dependencies {
     implementation("com.auth0:java-jwt:4.2.1")
     implementation("org.codehaus.mojo:aspectj-maven-plugin:1.14.0")
     implementation("org.springframework:spring-aspects:3.2.4.RELEASE")
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "yuta-komura_ddd-practice")
+        property("sonar.organization", "yuta-komura")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 val compileKotlin: KotlinCompile by tasks
