@@ -7,9 +7,7 @@ import com.yutakomura.domain.user.Password
 import com.yutakomura.domain.user.Person
 import com.yutakomura.infrastructure.security.LoginUser
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.stereotype.Component
 
-@Component
 class SignupInteractor : SignupUseCase {
     override fun handle(inputData: SignupInputData): SignupOutputData {
         val person = Person(Email(inputData.email), Password(inputData.password))

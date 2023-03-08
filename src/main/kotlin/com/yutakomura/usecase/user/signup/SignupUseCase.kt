@@ -1,5 +1,5 @@
 package com.yutakomura.usecase.user.signup
 
-interface SignupUseCase {
-    fun handle(inputData: SignupInputData): SignupOutputData
-}
+import com.yutakomura.usecase.core.UseCase
+
+interface SignupUseCase : UseCase<SignupInputData, SignupOutputData>
