@@ -6,7 +6,6 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      # 依存関係をダウンロードしてキャシュする
       - restore_cache:
           keys:
             - v1-dependencies-{{ .Branch }}-{{ checksum "build.gradle.kts" }}
@@ -20,6 +19,15 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ .Branch }}-{{ checksum "build.gradle.kts" }}
+
       - run:
           name: テストの実施
           command: gradle test
+      - run:
+          name: SonarCloudの分析
+          command: gradle build sonarqube"
+workflows:
+  main:
+    jobs:
+      - build:
+          context: SonarCloud
