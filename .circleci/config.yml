@@ -25,7 +25,7 @@ jobs:
           command: gradle test
       - run:
           name: SonarCloudの分析
-          command: gradle build sonarqube"
+          command: gradle build sonarqube
 workflows:
   version: 2
   main:
