@@ -4,18 +4,19 @@ import com.yutakomura.domain.user.Id
 import org.seasar.doma.Dao
 import org.seasar.doma.Insert
 import org.seasar.doma.Select
+import org.seasar.doma.Update
 import org.seasar.doma.boot.ConfigAutowireable
-import org.seasar.doma.jdbc.Result
 
 @Dao
 @ConfigAutowireable
 interface RoleRepository {
 
     @Select
-    fun selectByUserId(userId: Id): List<Role>
+    fun selectByUserId(userId: Id): List<GivenRole>
 
-    @Insert
-    fun insert(userId: Id, value: Value): Result<Role>
+    @Insert(sqlFile = true)
+    fun insert(userId: Id, value: Value): Int
 
-    fun updateByUserId(userId: Id, value: Value): Result<Role>
+    @Update(sqlFile = true)
+    fun updateByUserId(userId: Id, value: Value): Int
 }

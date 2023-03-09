@@ -1,0 +1,1 @@
+insert into role values (/* userId.value */0, /* value.value */'')

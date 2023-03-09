@@ -1,6 +1,7 @@
 package com.yutakomura.infrastructure.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yutakomura.controller.request.EmailAndPasswordJsonRequest
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.AuthenticationManager

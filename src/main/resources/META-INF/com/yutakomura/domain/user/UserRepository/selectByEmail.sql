@@ -3,4 +3,4 @@ select
 from
     user
 where
-    email =  /* email */''
+    email = /* email.value */''

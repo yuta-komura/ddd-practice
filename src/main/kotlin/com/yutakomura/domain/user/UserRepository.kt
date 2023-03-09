@@ -4,7 +4,6 @@ import org.seasar.doma.Dao
 import org.seasar.doma.Insert
 import org.seasar.doma.Select
 import org.seasar.doma.boot.ConfigAutowireable
-import org.seasar.doma.jdbc.Result
 import java.util.*
 
 @Dao
@@ -15,11 +14,14 @@ interface UserRepository {
     fun selectByEmail(email: Email): Optional<UniqueUser>
 
     @Select
-    fun selectById(id: Int): Optional<UniqueUser>
+    fun selectByAaa(email: String): Optional<UniqueUser>
+
+    @Select
+    fun selectById(id: Id): Optional<UniqueUser>
 
     @Select
     fun selectNum(): Int
 
-    @Insert
-    fun insert(id: Id?, email: Email, encodedPassword: EncodedPassword): Result<UniqueUser>
+    @Insert(sqlFile = true)
+    fun insert(email: Email, encodedPassword: EncodedPassword): Int
 }

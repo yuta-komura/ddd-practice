@@ -14,5 +14,5 @@ data class UniqueUser(
     @Column(name = "email")
     val email: Email,
     @Column(name = "password")
-    val password: Password
+    val encodedPassword: EncodedPassword
 )

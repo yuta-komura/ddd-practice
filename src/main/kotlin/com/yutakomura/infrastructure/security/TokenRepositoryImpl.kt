@@ -1,16 +1,11 @@
-package com.yutakomura.infrastructure
+package com.yutakomura.infrastructure.security
 
-import com.yutakomura.config.security.Key
-import com.yutakomura.config.security.Token
-import com.yutakomura.config.security.TokenRepository
-import com.yutakomura.config.security.Value
-import org.springframework.beans.factory.annotation.Autowired
+import com.yutakomura.infrastructure.SpringDIContainer
 import org.springframework.data.redis.core.StringRedisTemplate
 
 class TokenRepositoryImpl : TokenRepository {
 
-    @Autowired
-    private lateinit var redisTemplate: StringRedisTemplate
+    private val redisTemplate = SpringDIContainer.getBean(StringRedisTemplate::class.java)
 
     override fun selectByKey(key: Key): Token {
         val token = redisTemplate.opsForValue()[key.value]
