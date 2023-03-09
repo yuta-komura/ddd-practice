@@ -55,8 +55,6 @@ dependencies {
     implementation("org.springframework.security:spring-security-config:6.0.1")
     implementation("org.springframework.security:spring-security-web:6.0.1")
     implementation("com.auth0:java-jwt:4.2.1")
-    implementation("org.codehaus.mojo:aspectj-maven-plugin:1.14.0")
-    implementation("org.springframework:spring-aspects:3.2.4.RELEASE")
 }
 
 sonarqube {
