@@ -1,9 +1,7 @@
 package com.yutakomura.domain.user
 
 import com.yutakomura.infrastructure.SpringDIContainer
-import org.springframework.beans.factory.annotation.Configurable
 
-@Configurable(preConstruction = true)
 class AddableUser(
     val email: Email,
     val encodedPassword: EncodedPassword
