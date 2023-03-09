@@ -1,4 +1,4 @@
-package com.yutakomura
+package com.yutakomura.controller
 
 import com.yutakomura.infrastructure.SpringDIContainer
 import org.springframework.data.redis.core.StringRedisTemplate

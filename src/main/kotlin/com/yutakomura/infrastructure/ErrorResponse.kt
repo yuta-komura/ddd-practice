@@ -1,4 +1,4 @@
-package com.yutakomura
+package com.yutakomura.infrastructure
 
 import lombok.Value
 

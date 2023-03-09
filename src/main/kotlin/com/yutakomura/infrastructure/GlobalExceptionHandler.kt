@@ -1,4 +1,4 @@
-package com.yutakomura
+package com.yutakomura.infrastructure
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -18,7 +18,10 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         log.error(e.message)
         e.printStackTrace()
         val status = getStatus(request)
-        return ResponseEntity<ErrorResponse>(ErrorResponse(e.message, e.stackTraceToString()), status)
+        return ResponseEntity<ErrorResponse>(
+            ErrorResponse(e.message, e.stackTraceToString()),
+            status
+        )
     }
 
     private fun getStatus(request: HttpServletRequest): HttpStatus {

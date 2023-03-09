@@ -2,8 +2,8 @@ package com.yutakomura.infrastructure.security
 
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.yutakomura.ErrorResponse
-import com.yutakomura.Log
+import com.yutakomura.infrastructure.ErrorResponse
+import com.yutakomura.infrastructure.Log
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
@@ -31,7 +31,11 @@ class JWTTokenFilter(
                 val decodedJWT = jwtProvider.verifyToken(token)
                 val loginUser = jwtProvider.retrieve(decodedJWT)
                 val tokenRedis = redisTemplate.opsForValue()[loginUser.id.toString()]
-                if (!Objects.equals(token, tokenRedis)) throw JWTVerificationException("トークンが無効です。")
+                if (!Objects.equals(
+                        token,
+                        tokenRedis
+                    )
+                ) throw JWTVerificationException("トークンが無効です。")
                 SecurityContextHolder.getContext().authentication =
                     UsernamePasswordAuthenticationToken(loginUser, null, loginUser.authorities)
             }
@@ -43,7 +47,14 @@ class JWTTokenFilter(
             resHttp.contentType = "application/json"
             log.error(e.message)
             e.printStackTrace()
-            resHttp.writer.write(ObjectMapper().writeValueAsString(ErrorResponse(e.message, e.stackTraceToString())))
+            resHttp.writer.write(
+                ObjectMapper().writeValueAsString(
+                    ErrorResponse(
+                        e.message,
+                        e.stackTraceToString()
+                    )
+                )
+            )
             resHttp.flushBuffer()
         }
     }
