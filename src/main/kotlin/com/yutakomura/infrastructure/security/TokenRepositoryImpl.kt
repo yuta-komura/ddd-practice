@@ -1,11 +1,11 @@
 package com.yutakomura.infrastructure.security
 
-import com.yutakomura.infrastructure.SpringDIContainer
+import com.yutakomura.infrastructure.Container
 import org.springframework.data.redis.core.StringRedisTemplate
 
 class TokenRepositoryImpl : TokenRepository {
 
-    private val redisTemplate = SpringDIContainer.getBean(StringRedisTemplate::class.java)
+    private val redisTemplate = Container.getBean(StringRedisTemplate::class.java)
 
     override fun selectByKey(key: Key): Token {
         val token = redisTemplate.opsForValue()[key.value]

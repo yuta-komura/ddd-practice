@@ -3,7 +3,7 @@ package com.yutakomura.infrastructure.security
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.yutakomura.infrastructure.SpringDIContainer
+import com.yutakomura.infrastructure.Container
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.StringRedisTemplate
@@ -17,7 +17,7 @@ class JWTProviderImpl : JWTProvider {
     @Value("\${jwt.secret}")
     private lateinit var secret: String
 
-    private val redisTemplate = SpringDIContainer.getBean(StringRedisTemplate::class.java)
+    private val redisTemplate = Container.getBean(StringRedisTemplate::class.java)
 
     override fun createToken(user: LoginUser): String {
         val now = Date()

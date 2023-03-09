@@ -1,6 +1,6 @@
 package com.yutakomura.domain.user
 
-import com.yutakomura.infrastructure.SpringDIContainer
+import com.yutakomura.infrastructure.Container
 import org.springframework.dao.DuplicateKeyException
 
 class Person(
@@ -9,7 +9,7 @@ class Person(
 ) {
 
     private val userRepository: UserRepository =
-        SpringDIContainer.getBean(UserRepository::class.java)
+        Container.getBean(UserRepository::class.java)
 
     fun toAddableUser(): AddableUser {
         userRepository.selectByEmail(email)

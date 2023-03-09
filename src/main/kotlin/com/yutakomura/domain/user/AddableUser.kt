@@ -1,13 +1,13 @@
 package com.yutakomura.domain.user
 
-import com.yutakomura.infrastructure.SpringDIContainer
+import com.yutakomura.infrastructure.Container
 
 class AddableUser(
     val email: Email,
     val encodedPassword: EncodedPassword
 ) {
 
-    private val userRepository = SpringDIContainer.getBean(UserRepository::class.java)
+    private val userRepository = Container.getBean(UserRepository::class.java)
 
     fun register(): UniqueUser {
         userRepository.insert(email, encodedPassword)
