@@ -1,6 +1,6 @@
 package com.yutakomura.domain.user
 
-import org.springframework.beans.factory.annotation.Autowired
+import com.yutakomura.infrastructure.SpringDIContainer
 import org.springframework.beans.factory.annotation.Configurable
 
 @Configurable(preConstruction = true)
@@ -8,10 +8,12 @@ class AddableUser(
     val email: Email,
     val encodedPassword: EncodedPassword
 ) {
-    @Autowired
-    private lateinit var userRepository: UserRepository
+
+    private val userRepository = SpringDIContainer.getBean(UserRepository::class.java)
 
     fun register(): UniqueUser {
-        return userRepository.insert(null, email, encodedPassword).entity
+        userRepository.insert(email, encodedPassword)
+        return userRepository.selectByEmail(email)
+            .orElseThrow { RuntimeException("ユーザーアカウントが見つかりませんでした。") }
     }
 }
