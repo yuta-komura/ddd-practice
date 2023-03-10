@@ -17,7 +17,8 @@ class SignupInteractor : SignupUseCase {
         val uniqueUser = addableUser.register()
         val role = Role(uniqueUser.id, Value())
         val givenRole = role.give()
-        val loginUser = LoginUser(uniqueUser.id.value, listOf(SimpleGrantedAuthority(givenRole.value.value)))
+        val loginUser =
+            LoginUser(uniqueUser.id.value, listOf(SimpleGrantedAuthority(givenRole.value.value)))
         return SignupOutputData(loginUser)
     }
 }
