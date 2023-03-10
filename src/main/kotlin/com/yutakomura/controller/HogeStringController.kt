@@ -1,6 +1,6 @@
 package com.yutakomura.controller
 
-import com.yutakomura.infrastructure.Container
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(value = ["/hoge-string"])
 class HogeStringController {
 
-    private val redisTemplate = Container.getBean(StringRedisTemplate::class.java)
+    @Autowired
+    private lateinit var redisTemplate: StringRedisTemplate
 
     @RequestMapping(method = [RequestMethod.PUT])
     @Throws(Exception::class)
