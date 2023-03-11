@@ -62,6 +62,8 @@ sonarqube {
         property("sonar.projectKey", "yuta-komura_ddd-practice")
         property("sonar.organization", "yuta-komura")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.exclusions", "src/test/**")
+        property("sonar.exclusions", "src/**/Application.kt")
     }
 }
 
