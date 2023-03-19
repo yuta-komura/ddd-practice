@@ -9,7 +9,7 @@
 //import com.yutakomura.entity.User
 //import com.yutakomura.infrastructure.Message
 //import com.yutakomura.infrastructure.security.JWTProvider
-//import com.yutakomura.infrastructure.security.JWTProviderImpl.Companion.X_AUTH_TOKEN
+//import com.yutakomura.infrastructure.security.JWTProvider.Companion.X_AUTH_TOKEN
 //import com.yutakomura.infrastructure.security.LoginUser
 //import com.yutakomura.security.*
 //import com.yutakomura.security.SecurityConfiguration.Companion.ROLE_PREMIUM
