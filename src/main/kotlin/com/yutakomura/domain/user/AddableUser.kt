@@ -11,7 +11,8 @@ class AddableUser(
 
     fun register(): UniqueUser {
         userRepository.insert(email, encodedPassword)
-        return userRepository.selectByEmail(email)
-            .orElseThrow { RuntimeException("ユーザーアカウントが見つかりませんでした。") }
+        val uniqueUser = userRepository.selectByEmail(email)
+        uniqueUser ?: throw RuntimeException("ユーザーアカウントが見つかりませんでした。")
+        return uniqueUser
     }
 }

@@ -1,10 +1,8 @@
 package com.yutakomura.infrastructure
 
 import org.springframework.context.MessageSource
-import org.springframework.stereotype.Component
 import java.util.*
 
-@Component
 class Message {
     companion object {
 

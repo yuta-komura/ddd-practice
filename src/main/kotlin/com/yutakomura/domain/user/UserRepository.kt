@@ -4,20 +4,19 @@ import org.seasar.doma.Dao
 import org.seasar.doma.Insert
 import org.seasar.doma.Select
 import org.seasar.doma.boot.ConfigAutowireable
-import java.util.*
 
 @Dao
 @ConfigAutowireable
 interface UserRepository {
 
     @Select
-    fun selectByEmail(email: Email): Optional<UniqueUser>
+    fun selectByEmail(email: Email): UniqueUser?
 
     @Select
-    fun selectByAaa(email: String): Optional<UniqueUser>
+    fun selectByAaa(email: String): UniqueUser?
 
     @Select
-    fun selectById(id: Id): Optional<UniqueUser>
+    fun selectById(id: Id): UniqueUser?
 
     @Select
     fun selectNum(): Int

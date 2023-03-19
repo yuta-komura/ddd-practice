@@ -23,16 +23,18 @@ class JsonRequestAuthenticationProvider(
     override fun authenticate(authentication: Authentication): Authentication {
         val email = Email(authentication.principal as String)
         val password = Password(authentication.credentials as String)
-        val uniqueUser =
-            userRepository.selectByEmail(email).orElseThrow { BadCredentialsException("ユーザーアカウントが見つかりませんでした。") }
-        if (!passwordEncoder.matches(password.value, uniqueUser.encodedPassword.value)) {
-            throw BadCredentialsException("パスワードが正しくありません。")
+        val uniqueUser = userRepository.selectByEmail(email)
+        if (uniqueUser == null
+            || !passwordEncoder.matches(password.value, uniqueUser.encodedPassword.value)
+        ) {
+            throw BadCredentialsException("emailまたはパスワードが正しくありません。")
         }
         val roles = roleRepository.selectByUserId(uniqueUser.id)
         if (roles.isEmpty()) {
             throw BadCredentialsException("権限が見つかりませんでした。")
         }
-        val loginUser = LoginUser(uniqueUser.id.value, roles.map { SimpleGrantedAuthority(it.value.value) })
+        val loginUser =
+            LoginUser(uniqueUser.id.value, roles.map { SimpleGrantedAuthority(it.value.value) })
         return UsernamePasswordAuthenticationToken(loginUser, null, loginUser.authorities)
     }
 

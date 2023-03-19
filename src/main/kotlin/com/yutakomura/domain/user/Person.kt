@@ -12,8 +12,8 @@ class Person(
         Container.getBean(UserRepository::class.java)
 
     fun toAddableUser(): AddableUser {
-        userRepository.selectByEmail(email)
-            .ifPresent { throw DuplicateKeyException("emailが重複しています。") }
+        val uniqueUser = userRepository.selectByEmail(email)
+        if (uniqueUser != null) throw DuplicateKeyException("emailが重複しています。")
         val encodedPassword = EncodedPassword.from(password)
         return AddableUser(email, encodedPassword)
     }
