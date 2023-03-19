@@ -79,14 +79,14 @@ class JWTTokenFilterTest {
         `when`(jwtProvider.tokenValueFrom(request)).thenReturn(token)
         `when`(jwtProvider.verifyToken(token)).thenReturn(decodedJWT)
         `when`(jwtProvider.retrieve(decodedJWT)).thenReturn(loginUser)
-        `when`(tokenRepository.selectByKey(key)).thenReturn(tokenRedis)
+        `when`(tokenRepository.selectBy(key)).thenReturn(tokenRedis)
 
         jwtTokenFilter.doFilter(request, response, filterChain)
 
         verify(jwtProvider).tokenValueFrom(request)
         verify(jwtProvider).verifyToken(token)
         verify(jwtProvider).retrieve(decodedJWT)
-        verify(tokenRepository).selectByKey(key)
+        verify(tokenRepository).selectBy(key)
         verify(filterChain).doFilter(request, response)
     }
 
@@ -124,7 +124,7 @@ class JWTTokenFilterTest {
         `when`(jwtProvider.tokenValueFrom(request)).thenReturn(token)
         `when`(jwtProvider.verifyToken(token)).thenReturn(decodedJWT)
         `when`(jwtProvider.retrieve(decodedJWT)).thenReturn(loginUser)
-        `when`(tokenRepository.selectByKey(key)).thenReturn(tokenRedis)
+        `when`(tokenRepository.selectBy(key)).thenReturn(tokenRedis)
 
         assertThrows<JWTVerificationException> {
             jwtTokenFilter.doFilter(request, response, filterChain)
@@ -135,7 +135,7 @@ class JWTTokenFilterTest {
         verify(jwtProvider).tokenValueFrom(request)
         verify(jwtProvider).verifyToken(token)
         verify(jwtProvider).retrieve(decodedJWT)
-        verify(tokenRepository).selectByKey(key)
+        verify(tokenRepository).selectBy(key)
         verifyNoInteractions(filterChain)
     }
 
@@ -145,13 +145,12 @@ class JWTTokenFilterTest {
         val decodedJWT = mock(DecodedJWT::class.java)
         val loginUser = mock(LoginUser::class.java)
         val key = Key(loginUser.id.toString())
-        val tokenRedis = Token(key, Value(token))
 
         `when`(request.requestURI).thenReturn("/api/some_endpoint")
         `when`(jwtProvider.tokenValueFrom(request)).thenReturn(token)
         `when`(jwtProvider.verifyToken(token)).thenReturn(decodedJWT)
         `when`(jwtProvider.retrieve(decodedJWT)).thenReturn(loginUser)
-        `when`(tokenRepository.selectByKey(key)).thenReturn(null)
+        `when`(tokenRepository.selectBy(key)).thenReturn(null)
 
         assertThrows<JWTVerificationException> {
             jwtTokenFilter.doFilter(request, response, filterChain)
@@ -162,7 +161,7 @@ class JWTTokenFilterTest {
         verify(jwtProvider).tokenValueFrom(request)
         verify(jwtProvider).verifyToken(token)
         verify(jwtProvider).retrieve(decodedJWT)
-        verify(tokenRepository).selectByKey(key)
+        verify(tokenRepository).selectBy(key)
         verifyNoInteractions(filterChain)
     }
 }

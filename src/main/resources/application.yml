@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/dddpractice
+    username: dddpractice
+    password: cojedJsji822Kkk
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: localhost
+    port: 6379
+    password: skdjwuih8ASs)!01ios1DfD?2kd
+    database: 0
+  jackson:
+    time-zone: Asia/Tokyo
+kapt:
+  incremental:
+    apt: true
+  use:
+    worker:
+      api: true
+  include:
+    compile:
+      classpath: false
+jwt:
+  secret: assdklajsdajskl

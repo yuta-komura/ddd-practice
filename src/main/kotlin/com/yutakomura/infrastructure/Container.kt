@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import kotlin.properties.Delegates
 
 @Component
-class Container : ApplicationContextAware {
+class Container private constructor() : ApplicationContextAware {
 
     override fun setApplicationContext(applicationContext: ApplicationContext) {
         sApplicationContext = applicationContext

@@ -49,7 +49,7 @@ class SecurityConfigurationTest {
         assertNotNull(token)
         val decodedJWT: DecodedJWT = jwtProvider.verifyToken(token!!)
         val loginUser: LoginUser = jwtProvider.retrieve(decodedJWT)
-        val redisRegisteredToken = tokenRepository.selectByKey(Key(loginUser.id.toString()))
+        val redisRegisteredToken = tokenRepository.selectBy(Key(loginUser.id.toString()))
         assertNotNull(redisRegisteredToken)
         assertEquals(redisRegisteredToken!!.value.value, token)
     }

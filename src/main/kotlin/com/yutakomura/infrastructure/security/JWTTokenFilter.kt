@@ -30,7 +30,7 @@ class JWTTokenFilter(
         val token = jwtProvider.tokenValueFrom(request)
         val decodedJWT = jwtProvider.verifyToken(token)
         val loginUser = jwtProvider.retrieve(decodedJWT)
-        val tokenRedis = tokenRepository.selectByKey(Key(loginUser.id.toString()))
+        val tokenRedis = tokenRepository.selectBy(Key(loginUser.id.toString()))
         if (token != tokenRedis?.value?.value) {
             throw JWTVerificationException("トークンが無効です。")
         }

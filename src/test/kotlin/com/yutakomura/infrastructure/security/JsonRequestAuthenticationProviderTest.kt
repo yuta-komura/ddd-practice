@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @SpringBootTest
 @AutoConfigureMockMvc
 class JsonRequestAuthenticationProviderTest {
+
     lateinit var authProvider: JsonRequestAuthenticationProvider
 
     @MockkBean
