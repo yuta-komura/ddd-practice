@@ -54,11 +54,10 @@ dependencies {
     implementation("org.seasar.doma:doma:2.24.0")
     implementation("org.seasar.doma.boot:doma-spring-boot-starter:1.7.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    implementation("org.springframework.boot:spring-boot-starter-redis:1.4.7.RELEASE")
-    implementation("org.springframework.data:spring-data-redis:3.0.3")
     implementation("org.springframework.security:spring-security-config:6.0.2")
     implementation("org.springframework.security:spring-security-web:6.0.2")
     implementation("com.auth0:java-jwt:4.3.0")
+    implementation("io.lettuce:lettuce-core:6.2.3.RELEASE")
 }
 
 sonarqube {
