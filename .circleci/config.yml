@@ -22,7 +22,7 @@ jobs:
 
       - run:
           name: テストの実施
-          command: gradle test
+          command: gradle test --stacktrace
       - run:
           name: SonarCloudの分析
           command: gradle build sonarqube
