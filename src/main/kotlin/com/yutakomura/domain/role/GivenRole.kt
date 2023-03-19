@@ -9,8 +9,8 @@ import org.seasar.doma.Table
 @Entity(immutable = true)
 @Table(name = "role")
 data class GivenRole(
-    @Column(name = "userid")
-    val userid: Id,
+    @Column(name = "user_id")
+    val userId: Id,
     @Column(name = "value")
     val value: Value
 )
