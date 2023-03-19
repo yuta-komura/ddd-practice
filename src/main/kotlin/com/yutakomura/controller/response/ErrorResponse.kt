@@ -24,12 +24,12 @@ class ErrorResponse private constructor(
             val message = errorAttributes["message"] as String?
             val path = errorAttributes["path"] as String?
             return ErrorResponse(
-                timestamp,
-                status,
-                error,
-                trace?.takeIf { it.isNotEmpty() },
-                message?.takeIf { it.isNotEmpty() },
-                path?.takeIf { it.isNotEmpty() },
+                timestamp = timestamp,
+                status = status,
+                error = error,
+                trace = trace,
+                message = message,
+                path = path
             )
         }
     }
