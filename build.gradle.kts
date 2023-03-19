@@ -46,15 +46,19 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("org.springframework.security:spring-security-test:6.0.2")
+    testImplementation("net.bytebuddy:byte-buddy:1.14.2")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
     kapt("org.seasar.doma:doma:2.24.0")
     implementation("org.seasar.doma:doma:2.24.0")
     implementation("org.seasar.doma.boot:doma-spring-boot-starter:1.7.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.boot:spring-boot-starter-redis:1.4.7.RELEASE")
-    implementation("org.springframework.data:spring-data-redis:3.0.0")
-    implementation("org.springframework.security:spring-security-config:6.0.1")
-    implementation("org.springframework.security:spring-security-web:6.0.1")
-    implementation("com.auth0:java-jwt:4.2.1")
+    implementation("org.springframework.data:spring-data-redis:3.0.3")
+    implementation("org.springframework.security:spring-security-config:6.0.2")
+    implementation("org.springframework.security:spring-security-web:6.0.2")
+    implementation("com.auth0:java-jwt:4.3.0")
 }
 
 sonarqube {
@@ -97,6 +101,15 @@ dependencyManagement {
     }
 }
 
-tasks.withType<Test> {
+tasks.named<Test>("test") {
+    jvmArgs("-Xshare:off")
     useJUnitPlatform()
+    finalizedBy("jacocoTestReport")
+}
+
+tasks.named<JacocoReport>("jacocoTestReport") {
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+    }
 }
