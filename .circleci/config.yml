@@ -3,14 +3,14 @@ jobs:
   build:
     docker:
       - image: cimg/openjdk:17.0.5
-      - image: redis
+      - image: cimg/redis:6.2.6
         environment:
-          REDIS_PASSWORD: 'skdjwuih8ASs)!01ios1DfD?2kd'
-      - image: circleci/mysql:5.7.22
+          REDIS_PASSWORD: "skdjwuih8ASs)!01ios1DfD?2kd"
+      - image: cimg/mysql:8.0
         environment:
-          MYSQL_DATABASE: 'dddpractice'
-          MYSQL_USER: 'dddpractice'
-          MYSQL_ROOT_PASSWORD: 'cojedJsji822Kkk'
+          MYSQL_DATABASE: "dddpractice"
+          MYSQL_USER: "dddpractice"
+          MYSQL_ROOT_PASSWORD: "cojedJsji822Kkk"
     working_directory: ~/repo
     steps:
       - checkout
@@ -27,7 +27,6 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ .Branch }}-{{ checksum "build.gradle.kts" }}
-
       - run:
           name: テストの実施
           command: gradle test
