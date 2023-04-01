@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create a DBInstance for MySQL
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "Project Name Prefix"
+        Parameters:
+          - PJPrefix
+      - Label:
+          default: "RDS Configuration"
+        Parameters:
+          - Service
+          - MySQLVersion
+          - DBInstanceClass
+          - DBInstanceStorageSize
+          - DBInstanceStorageType
+          - DBMasterUserName
+          - DBPassword
+          - MultiAZ
+    ParameterLabels:
+      Service:
+        default: "Service"
+      MySQLVersion:
+        default: "MySQLVersion"
+      DBInstanceClass:
+        default: "DBInstanceClass"
+      DBInstanceStorageSize:
+        default: "DBInstanceStorageSize"
+      DBInstanceStorageType:
+        default: "DBInstanceStorageType"
+      DBMasterUserName:
+        default: "DBUserName"
+      DBPassword:
+        default: "DBPassword"
+      MultiAZ:
+        default: "MultiAZ"
+
+# ------------------------------------------------------------#
+# Input Parameters
+# ------------------------------------------------------------#
+Parameters:
+  PJPrefix:
+    Type: String
+    Default: "ddd-practice-prd"
+  Service:
+    Type: String
+    Default: "user"
+  MySQLVersion:
+    Type: String
+    Default: "8.0.25"
+  DBInstanceClass:
+    Type: String
+    Default: "db.t3.micro"
+  DBInstanceStorageSize:
+    Type: String
+    Default: "20"
+  DBInstanceStorageType:
+    Type: String
+    Default: "gp2"
+  DBMasterUserName:
+    Type: String
+    Default: "dddpractice"
+    NoEcho: true
+    MinLength: 1
+    MaxLength: 16
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+  DBPassword:
+    Default: "cojedJsji822Kkk"
+    NoEcho: true
+    Type: String
+    MinLength: 8
+    MaxLength: 41
+    AllowedPattern: "[a-zA-Z0-9]*"
+  MultiAZ:
+    Default: "false"
+    Type: String
+    AllowedValues: [ "true", "false" ]
+
+Resources:
+  # ------------------------------------------------------------#
+  #  DBInstance MySQL
+  # ------------------------------------------------------------#
+  DBInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBInstanceIdentifier: !Sub "${PJPrefix}-${Service}"
+      Engine: MySQL
+      EngineVersion: !Ref MySQLVersion
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref DBInstanceStorageSize
+      StorageType: !Ref DBInstanceStorageType
+      DBName: !Ref Service
+      MasterUsername: !Ref DBMasterUserName
+      MasterUserPassword: !Ref DBPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      PubliclyAccessible: false
+      MultiAZ: !Ref MultiAZ
+      PreferredBackupWindow: "18:00-18:30"
+      PreferredMaintenanceWindow: "sat:19:00-sat:19:30"
+      AutoMinorVersionUpgrade: false
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      CopyTagsToSnapshot: true
+      BackupRetentionPeriod: 7
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PJPrefix}-${Service}"
+    DeletionPolicy: "Delete"
+
+  # ------------------------------------------------------------#
+  #  SecurityGroup for RDS (MySQL)
+  # ------------------------------------------------------------#
+  RDSSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: { "Fn::ImportValue": !Sub "${PJPrefix}-vpc" }
+      GroupName: !Sub "${PJPrefix}-${Service}-rds-sg"
+      GroupDescription: "-"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PJPrefix}-${Service}-rds-sg"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: { "Fn::ImportValue": !Sub "${PJPrefix}-vpc-cidr" }
+
+  # ------------------------------------------------------------#
+  #  DBSubnetGroup
+  # ------------------------------------------------------------#
+  DBSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupName: !Sub "${PJPrefix}-${Service}-rds-subnet"
+      DBSubnetGroupDescription: "-"
+      SubnetIds:
+        - { "Fn::ImportValue": !Sub "${PJPrefix}-private-subnet-a" }
+        - { "Fn::ImportValue": !Sub "${PJPrefix}-private-subnet-c" }
+
+# ------------------------------------------------------------#
+# Output Parameters
+# ------------------------------------------------------------#
+Outputs:
+  DBInstanceID:
+    Value: !Ref DBInstance
+    Export:
+      Name: !Sub "${PJPrefix}-${Service}-rds-id"
+
+  DBInstanceEndpoint:
+    Value: !GetAtt DBInstance.Endpoint.Address
+    Export:
+      Name: !Sub "${PJPrefix}-${Service}-rds-endpoint"
+
+  DBName:
+    Value: !Ref Service
+    Export:
+      Name: !Sub "${PJPrefix}-${Service}-rds-dbname"
