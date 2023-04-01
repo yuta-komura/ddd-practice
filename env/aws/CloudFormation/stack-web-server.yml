@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create an EC2Instance for Ubuntu web server
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "Project Name Prefix"
+        Parameters:
+          - PJPrefix
+      - Label:
+          default: "Server Configuration"
+        Parameters:
+          - Service
+          - EC2InstanceType
+          - AllowSSM
+    ParameterLabels:
+      Service:
+        default: "Service"
+      EC2InstanceType:
+        default: "EC2InstanceType"
+      AllowSSM:
+        default: "AllowSSM"
+
+# ------------------------------------------------------------#
+# Input Parameters
+# ------------------------------------------------------------#
+Parameters:
+  PJPrefix:
+    Type: String
+    Default: "ddd-practice-prd"
+  Service:
+    Type: String
+    Default: "user"
+  EC2InstanceType:
+    Type: String
+    Default: "t2.micro"
+  AllowSSM:
+    Default: "false"
+    Type: String
+    AllowedValues: [ "true", "false" ]
+
+Resources:
+  # ------------------------------------------------------------#
+  #  EC2Instance Ubuntu
+  # ------------------------------------------------------------#
+  EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      # Ubuntu Server 22.04 LTS (HVM), SSD Volume Type (64-bit (x86))
+      ImageId: ami-0b828c1c5ac3f13ee
+      InstanceType: !Ref EC2InstanceType
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: { "Fn::ImportValue": !Sub "${PJPrefix}-public-subnet-a" }
+          GroupSet:
+            - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref IamInstanceProfile
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJPrefix}-${Service}"
+        - Key: AllowSSM
+          Value: !Sub ${AllowSSM}
+
+          # ------------------------------------------------------------#
+          #  SecurityGroup for EC2Instance (Ubuntu)
+          # ------------------------------------------------------------#
+  EC2SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: { "Fn::ImportValue": !Sub "${PJPrefix}-vpc" }
+      GroupName: !Sub "${PJPrefix}-${Service}-ec2-sg"
+      GroupDescription: "-"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PJPrefix}-${Service}-ec2-sg"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0"
+
+  # ------------------------------------------------------------#
+  #  IamInstanceProfile
+  # ------------------------------------------------------------#
+  IamInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref IamRole
+
+  # ------------------------------------------------------------#
+  #  IamRole
+  # ------------------------------------------------------------#
+  IamRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      RoleName: !Sub "${PJPrefix}-${Service}-iam-role"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+# ------------------------------------------------------------#
+# Output Parameters
+# ------------------------------------------------------------#
+Outputs:
+  EC2PublicIP:
+    Value: !GetAtt EC2.PublicIp
+    Description: Public IP of EC2 instance
+
+  EC2SecurityGroup:
+    Value: !Ref EC2SecurityGroup
+    Export:
+      Name: !Sub "${PJPrefix}-${Service}-ec2-sg"

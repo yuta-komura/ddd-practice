@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create a cluster for Redis
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "Project Name Prefix"
+        Parameters:
+          - PJPrefix
+      - Label:
+          default: "Redis Configuration"
+        Parameters:
+          - Service
+          - RedisVersion
+          - RedisClusterClass
+    ParameterLabels:
+      Service:
+        default: "Service"
+      RedisVersion:
+        default: "RedisVersion"
+      RedisClusterClass:
+        default: "RedisClusterClass"
+
+# ------------------------------------------------------------#
+# Input Parameters
+# ------------------------------------------------------------#
+Parameters:
+  PJPrefix:
+    Type: String
+    Default: "ddd-practice-prd"
+  Service:
+    Type: String
+    Default: "auth-token"
+  RedisVersion:
+    Type: String
+    Default: "7.0"
+  RedisClusterClass:
+    Type: String
+    Default: "cache.t2.micro"
+
+Resources:
+  # ------------------------------------------------------------#
+  #  Cluster Redis
+  # ------------------------------------------------------------#
+  RedisCluster:
+    Type: "AWS::ElastiCache::CacheCluster"
+    Properties:
+      AutoMinorVersionUpgrade: true
+      CacheNodeType: !Ref RedisClusterClass
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      Engine: redis
+      EngineVersion: !Ref RedisVersion
+      NumCacheNodes: 1
+      Port: 6379
+      ClusterName: !Sub "${PJPrefix}-${Service}"
+      VpcSecurityGroupIds:
+        - !Ref RedisSecurityGroup
+
+  # ------------------------------------------------------------#
+  #  SecurityGroup for ElastiCache (redis)
+  # ------------------------------------------------------------#
+  RedisSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: { "Fn::ImportValue": !Sub "${PJPrefix}-vpc" }
+      GroupName: !Sub "${PJPrefix}-${Service}-sg"
+      GroupDescription: "-"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PJPrefix}-${Service}-sg"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          CidrIp: { "Fn::ImportValue": !Sub "${PJPrefix}-vpc-cidr" }
+
+  # ------------------------------------------------------------#
+  #  RedisSubnetGroup
+  # ------------------------------------------------------------#
+  RedisSubnetGroup:
+    Type: "AWS::ElastiCache::SubnetGroup"
+    Properties:
+      CacheSubnetGroupName: !Sub "${PJPrefix}-${Service}-subnet"
+      Description: "-"
+      SubnetIds:
+        - { "Fn::ImportValue": !Sub "${PJPrefix}-private-subnet-a" }
+        - { "Fn::ImportValue": !Sub "${PJPrefix}-public-subnet-a" }
+        - { "Fn::ImportValue": !Sub "${PJPrefix}-private-subnet-c" }
+        - { "Fn::ImportValue": !Sub "${PJPrefix}-public-subnet-c" }
+
+# ------------------------------------------------------------#
+# Output Parameters
+# ------------------------------------------------------------#
+Outputs:
+  RedisClusterID:
+    Value: !Ref RedisCluster
+    Export:
+      Name: !Sub "${PJPrefix}-${Service}-id"
