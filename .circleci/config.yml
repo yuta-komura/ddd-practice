@@ -1,8 +1,41 @@
-version: 2
+version: 2.1
+
+parameters:
+  MYSQL_ROOT_PASSWORD:
+    type: string
+    default: "cojedJsji822Kkk"
+  MYSQL_DATABASE:
+    type: string
+    default: "dddpractice"
+  MYSQL_USER:
+    type: string
+    default: "dddpractice"
+  MYSQL_PASSWORD:
+    type: string
+    default: "cojedJsji822Kkk"
+  REDIS_PASSWORD:
+    type: string
+    default: "skdjwuih8ASs)!01ios1DfD?2kd"
+
 jobs:
-  build:
+  test:
     docker:
       - image: cimg/openjdk:17.0.5
+      - image: cimg/mysql:8.0
+        environment:
+          MYSQL_ROOT_PASSWORD: << pipeline.parameters.MYSQL_ROOT_PASSWORD >>
+          MYSQL_DATABASE: << pipeline.parameters.MYSQL_DATABASE >>
+          MYSQL_USER: << pipeline.parameters.MYSQL_USER >>
+          MYSQL_PASSWORD: << pipeline.parameters.MYSQL_PASSWORD >>
+      - image: cimg/redis:6.2.6
+        environment:
+          REDIS_PASSWORD: << pipeline.parameters.REDIS_PASSWORD >>
+    environment:
+      MYSQL_ROOT_PASSWORD: << pipeline.parameters.MYSQL_ROOT_PASSWORD >>
+      MYSQL_DATABASE: << pipeline.parameters.MYSQL_DATABASE >>
+      MYSQL_USER: << pipeline.parameters.MYSQL_USER >>
+      MYSQL_PASSWORD: << pipeline.parameters.MYSQL_PASSWORD >>
+      REDIS_PASSWORD: << pipeline.parameters.REDIS_PASSWORD >>
     working_directory: ~/repo
     steps:
       - checkout
@@ -11,24 +44,44 @@ jobs:
             - v1-dependencies-{{ .Branch }}-{{ checksum "build.gradle.kts" }}
             - v1-dependencies-{{ .Branch }}-
             - v1-dependencies-
-      - run: gradle dependencies
       - run:
-          name: ビルドの実施
-          command: gradle build -x test
+          name: MySQLの準備を待つ
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo 成功 && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo MySQLの待機に失敗 && exit 1
+      - run:
+          name: default-mysql-clientをインストール
+          command: |
+            sudo apt update
+            sudo apt install default-mysql-client
+      - run:
+          name: クエリを実行
+          command: |
+            mysql -h 127.0.0.1 -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < sql/ddl.sql
+      - run:
+          name: Gradle依存関係を解決
+          command: gradle dependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ .Branch }}-{{ checksum "build.gradle.kts" }}
-
       - run:
-          name: テストの実施
+          name: テストを実行
           command: gradle test
       - run:
-          name: SonarCloudの分析
+          name: SonarCloudで分析
           command: gradle build sonarqube
+      - store_artifacts:
+          path: ~/repo/build/reports
+
 workflows:
   version: 2
   main:
     jobs:
-      - build:
+      - test:
           context: SonarCloud
