@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates a permission set with read-only access to AWS resources and allows starting SSM sessions on EC2 instances with 'AllowSSM' tag set to 'true'."
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "SSO Configuration"
+        Parameters:
+          - IAMIdentityCenterInstanceARN
+    ParameterLabels:
+      IAMIdentityCenterInstanceARN:
+        default: "IAMIdentityCenterInstanceARN"
+
+# ------------------------------------------------------------#
+# Input Parameters
+# ------------------------------------------------------------#
+Parameters:
+  IAMIdentityCenterInstanceARN:
+    Type: String
+    Default: "arn:aws:sso:::instance/ssoins-77581d0e965d1c29"
+
+Resources:
+  # ------------------------------------------------------------#
+  #  PermissionSet
+  # ------------------------------------------------------------#
+  PermissionSet:
+    Type: "AWS::SSO::PermissionSet"
+    Properties:
+      InstanceArn: !Ref IAMIdentityCenterInstanceARN
+      Name: "ReadOnlyAccess"
+      Description: "This permission set provides read-only access to AWS resources"
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+      CustomerManagedPolicyReferences:
+        - Name: AllowSSMInstancePolicy
+
+  # ------------------------------------------------------------#
+  #  CustomerManagedPolicy
+  # ------------------------------------------------------------#
+  CustomerManagedPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: "AllowSSMInstancePolicy"
+      Description: "This policy allows users to start an SSM session on EC2 instances with the 'AllowSSM' tag set to 'true'"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "ssm:StartSession"
+            Resource:
+              - "arn:aws:ec2:*:*:instance/*"
+            Condition:
+              StringEquals:
+                "aws:ResourceTag/AllowSSM": "true"
+
+# ------------------------------------------------------------#
+# Output Parameters
+# ------------------------------------------------------------#
+Outputs:
+  PermissionSet:
+    Value: !Ref PermissionSet
+    Export:
+      Name: "PermissionSet"
