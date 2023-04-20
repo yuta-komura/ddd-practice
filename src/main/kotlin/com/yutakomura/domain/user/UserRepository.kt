@@ -1,6 +1,7 @@
 package com.yutakomura.domain.user
 
 import org.seasar.doma.Dao
+import org.seasar.doma.Delete
 import org.seasar.doma.Insert
 import org.seasar.doma.Select
 import org.seasar.doma.boot.ConfigAutowireable
@@ -23,4 +24,7 @@ interface UserRepository {
 
     @Insert(sqlFile = true)
     fun insert(email: Email, encodedPassword: EncodedPassword): Int
+
+    @Delete(sqlFile = true)
+    fun deleteByEmail(email: Email): Int
 }

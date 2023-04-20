@@ -2,8 +2,13 @@ package com.yutakomura.infrastructure.security
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yutakomura.domain.user.Email
+import com.yutakomura.domain.user.UserRepository
 import com.yutakomura.infrastructure.security.JWTProvider.Companion.X_AUTH_TOKEN
+import com.yutakomura.usecase.user.signup.SignupInputData
+import com.yutakomura.usecase.user.signup.SignupUseCase
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
@@ -33,6 +38,21 @@ class SecurityConfigurationTest {
 
     @Autowired
     private lateinit var tokenRepository: TokenRepository
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
+    @Autowired
+    private lateinit var signup: SignupUseCase
+
+    @BeforeEach
+    fun setup() {
+        val email = "aaa@gmail.com"
+        val password = "aaaa"
+        userRepository.deleteByEmail(Email(email))
+        val inputData = SignupInputData(email, password)
+        signup.handle(inputData)
+    }
 
     @Test
     fun `ログインAPIは正しい入力がされた場合、X-Auth-Tokenを返却し、トークンをRedisに保存すること`() {
