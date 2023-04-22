@@ -2,14 +2,11 @@ package com.yutakomura.infrastructure.security
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.ninjasquad.springmockk.MockkBean
 import com.yutakomura.domain.user.Email
 import com.yutakomura.domain.user.EncodedPassword
-import com.yutakomura.domain.user.Password
 import com.yutakomura.domain.user.UserRepository
 import com.yutakomura.infrastructure.security.JWTProvider.Companion.X_AUTH_TOKEN
 import com.yutakomura.usecase.user.signup.SignupUseCase
-import io.mockk.every
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import java.nio.file.Paths
@@ -49,16 +45,12 @@ class SecurityConfigurationTest {
     @Autowired
     private lateinit var signup: SignupUseCase
 
-    @MockkBean
-    lateinit var passwordEncoder: PasswordEncoder
-
     @BeforeEach
     fun setup() {
         val email = Email("aaa@gmail.com")
         userRepository.deleteByEmail(email)
-        val password = Password("aaaa")
-        every { passwordEncoder.encode(password.value) } returns "{bcrypt}\$2a\$10\$275XYyZ6IOE2p0Jxw4lY7.UeZo9oZRJJS9qtD/DJ3pZa39gBeZ4Y."
-        val encodedPassword = EncodedPassword.from(password)
+        val encodedPassword =
+            EncodedPassword("{bcrypt}\$2a\$10\$275XYyZ6IOE2p0Jxw4lY7.UeZo9oZRJJS9qtD/DJ3pZa39gBeZ4Y.")
         userRepository.insert(email, encodedPassword)
     }
 
