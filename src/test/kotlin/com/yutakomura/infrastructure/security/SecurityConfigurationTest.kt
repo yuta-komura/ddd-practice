@@ -2,11 +2,13 @@ package com.yutakomura.infrastructure.security
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yutakomura.domain.role.RoleRepository
+import com.yutakomura.domain.role.Value
 import com.yutakomura.domain.user.Email
+import com.yutakomura.domain.user.EncodedPassword
+import com.yutakomura.domain.user.UniqueUser
 import com.yutakomura.domain.user.UserRepository
 import com.yutakomura.infrastructure.security.JWTProvider.Companion.X_AUTH_TOKEN
-import com.yutakomura.usecase.user.signup.SignupInputData
-import com.yutakomura.usecase.user.signup.SignupUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import java.nio.file.Paths
@@ -43,7 +46,7 @@ class SecurityConfigurationTest {
     private lateinit var userRepository: UserRepository
 
     @Autowired
-    private lateinit var signupUseCase: SignupUseCase
+    private lateinit var roleRepository: RoleRepository
 
     @BeforeEach
     fun setup() {
@@ -52,8 +55,13 @@ class SecurityConfigurationTest {
         )
         val email = Email(json["email"].textValue())
         userRepository.deleteByEmail(email)
-        val inputData = SignupInputData(json["email"].textValue(), json["password"].textValue())
-        signupUseCase.handle(inputData)
+        val encodedPassword = EncodedPassword(
+            PasswordEncoderFactories.createDelegatingPasswordEncoder()
+                .encode(json["password"].textValue())
+        )
+        userRepository.insert(email, encodedPassword)
+        val uniqueUser: UniqueUser? = userRepository.selectByEmail(email)
+        roleRepository.insert(uniqueUser!!.id, Value("free"))
     }
 
     @Test
