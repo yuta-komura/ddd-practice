@@ -3,9 +3,9 @@ package com.yutakomura.infrastructure.security
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yutakomura.domain.user.Email
-import com.yutakomura.domain.user.EncodedPassword
 import com.yutakomura.domain.user.UserRepository
 import com.yutakomura.infrastructure.security.JWTProvider.Companion.X_AUTH_TOKEN
+import com.yutakomura.usecase.user.signup.SignupInputData
 import com.yutakomura.usecase.user.signup.SignupUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -43,15 +43,17 @@ class SecurityConfigurationTest {
     private lateinit var userRepository: UserRepository
 
     @Autowired
-    private lateinit var signup: SignupUseCase
+    private lateinit var signupUseCase: SignupUseCase
 
     @BeforeEach
     fun setup() {
-        val email = Email("aaa@gmail.com")
+        val json = objectMapper.readTree(
+            Paths.get("${testDirPath}/body1.json").toFile()
+        )
+        val email = Email(json["email"].textValue())
         userRepository.deleteByEmail(email)
-        val encodedPassword =
-            EncodedPassword("{bcrypt}\$2a\$10\$275XYyZ6IOE2p0Jxw4lY7.UeZo9oZRJJS9qtD/DJ3pZa39gBeZ4Y.")
-        userRepository.insert(email, encodedPassword)
+        val inputData = SignupInputData(json["email"].textValue(), json["password"].textValue())
+        signupUseCase.handle(inputData)
     }
 
     @Test
