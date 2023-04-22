@@ -3,7 +3,6 @@ package com.yutakomura.infrastructure.security
 import com.ninjasquad.springmockk.MockkBean
 import com.yutakomura.domain.role.GivenRole
 import com.yutakomura.domain.role.RoleRepository
-import com.yutakomura.domain.role.Value
 import com.yutakomura.domain.user.*
 import io.mockk.every
 import io.mockk.mockk
@@ -45,6 +44,7 @@ class JsonRequestAuthenticationProviderTest {
         val id = Id(1)
         val email = Email("test@example.com")
         val password = Password("testpassword")
+        every { passwordEncoder.encode(password.value) } returns "testencodedpassword"
         val encodedPassword = EncodedPassword.from(password)
         val uniqueUser = UniqueUser(id, email, encodedPassword)
         every { userRepository.selectByEmail(email) } returns uniqueUser
@@ -71,9 +71,10 @@ class JsonRequestAuthenticationProviderTest {
     }
 
     @Test
-    fun `emailが間違っている、BadCredentialsExceptionをスローする`() {
+    fun `emailが間違っている場合、BadCredentialsExceptionをスローする`() {
         val email = Email("test@example.com")
         val password = Password("testpassword")
+        // emailがみつからない
         every { userRepository.selectByEmail(email) } returns null
 
         assertThrows<BadCredentialsException> {
@@ -98,15 +99,12 @@ class JsonRequestAuthenticationProviderTest {
         val userRepository = mockk<UserRepository>()
         every { userRepository.selectByEmail(Email(email)) } returns uniqueUser
         val passwordEncoder = mockk<PasswordEncoder>()
+        // パスワードが間違っている
         every { passwordEncoder.matches(password, encodedPassword) } returns false
-        val roleRepository = mockk<RoleRepository>()
-        val role = GivenRole(Id(id), Value("USER"))
-        every { roleRepository.selectByUserId(Id(id)) } returns listOf(role)
 
         val provider =
             JsonRequestAuthenticationProvider(userRepository, roleRepository, passwordEncoder)
 
-        // テスト実行
         assertThrows<BadCredentialsException> {
             provider.authenticate(UsernamePasswordAuthenticationToken(email, password))
         }
@@ -117,10 +115,12 @@ class JsonRequestAuthenticationProviderTest {
         val id = Id(1)
         val email = Email("test@example.com")
         val password = Password("testpassword")
+        every { passwordEncoder.encode(password.value) } returns "testencodedpassword"
         val encodedPassword = EncodedPassword.from(password)
         val uniqueUser = UniqueUser(id, email, encodedPassword)
         every { userRepository.selectByEmail(email) } returns uniqueUser
         every { passwordEncoder.matches(password.value, encodedPassword.value) } returns true
+        // 権限がみつからない
         val roles: List<GivenRole> = emptyList()
         every { roleRepository.selectByUserId(uniqueUser.id) } returns roles
 

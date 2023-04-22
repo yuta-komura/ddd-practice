@@ -55,7 +55,7 @@ class SecurityConfigurationTest {
     }
 
     @Test
-    fun `ログインAPIは正しい入力がされた場合、X-Auth-Tokenを返却し、トークンをRedisに保存すること`() {
+    fun `ログインが成功した場合X-Auth-Tokenを返却し、トークンがRedisに保存されること`() {
         val json = objectMapper.readTree(
             Paths.get("${testDirPath}/body1.json").toFile()
         )
@@ -75,7 +75,7 @@ class SecurityConfigurationTest {
     }
 
     @Test
-    fun `ログインAPIは正しい入力がされない場合、X-Auth-Tokenを返却し、トークンをRedisに保存すること`() {
+    fun `ログインが失敗した場合X-Auth-Tokenが返却されないこと`() {
         val json = objectMapper.readTree(
             Paths.get("${testDirPath}/body2.json").toFile()
         )
