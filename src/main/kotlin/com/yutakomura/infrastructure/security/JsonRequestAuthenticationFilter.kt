@@ -14,7 +14,10 @@ class JsonRequestAuthenticationFilter(
     private val authenticationManager: AuthenticationManager
 ) : UsernamePasswordAuthenticationFilter() {
 
-    override fun attemptAuthentication(req: HttpServletRequest, res: HttpServletResponse): Authentication {
+    override fun attemptAuthentication(
+        req: HttpServletRequest,
+        res: HttpServletResponse
+    ): Authentication {
         val mapper = ObjectMapper()
         val principal = mapper.readValue(req.inputStream, EmailAndPasswordJsonRequest::class.java)
         val authRequest = UsernamePasswordAuthenticationToken(principal.email, principal.password)
