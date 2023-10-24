@@ -1,0 +1,1 @@
+insert into user values (null, /* email.value */'', /* encodedPassword.value */'')
